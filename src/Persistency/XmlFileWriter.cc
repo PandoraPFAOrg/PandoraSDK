@@ -324,14 +324,14 @@ StatusCode XmlFileWriter::WriteComponent(const std::string &elementName, const u
 
 StatusCode XmlFileWriter::WriteGlobalHeader()
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteHeader(HEADER_CONTAINER));
+    RETURN_ON_ERROR(this->WriteHeader(HEADER_CONTAINER));
 
     if (HEADER_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteMetadata());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSchemaRegistry());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteFooter());
+    RETURN_ON_ERROR(this->WriteMetadata());
+    RETURN_ON_ERROR(this->WriteSchemaRegistry());
+    RETURN_ON_ERROR(this->WriteFooter());
 
     return STATUS_CODE_SUCCESS;
 }
@@ -378,7 +378,7 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
         return STATUS_CODE_FAILURE;
 
     FieldMap fields;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pSubDetectorFactory->Write(pSubDetector, fields));
+    RETURN_ON_ERROR(m_pSubDetectorFactory->Write(pSubDetector, fields));
 
     fields.Set("subDetectorName", pSubDetector->GetSubDetectorName());
     fields.Set("subDetectorType", pSubDetector->GetSubDetectorType());
@@ -434,7 +434,7 @@ StatusCode XmlFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
     fields.Set("wireAngleW", pLArTPC->GetWireAngleW());
     fields.Set("sigmaUVW", pLArTPC->GetSigmaUVW());
     fields.Set("isDriftInPositiveX", pLArTPC->IsDriftInPositiveX());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Write(pLArTPC, fields));
+    RETURN_ON_ERROR(m_pLArTPCFactory->Write(pLArTPC, fields));
 
     return this->WriteComponent("LArTPC", GetSchemaVersion(LAR_TPC_COMPONENT), fields);
 }
@@ -453,7 +453,7 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
     if (nullptr != pLineGap)
     {
         FieldMap fields;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, fields));
+        RETURN_ON_ERROR(m_pLineGapFactory->Write(pLineGap, fields));
         fields.Set("lineGapType", pLineGap->GetLineGapType());
         fields.Set("lineStartX", pLineGap->GetLineStartX());
         fields.Set("lineEndX", pLineGap->GetLineEndX());
@@ -464,7 +464,7 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
     else if (nullptr != pBoxGap)
     {
         FieldMap fields;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Write(pBoxGap, fields));
+        RETURN_ON_ERROR(m_pBoxGapFactory->Write(pBoxGap, fields));
         fields.Set("vertex", pBoxGap->GetVertex());
         fields.Set("side1", pBoxGap->GetSide1());
         fields.Set("side2", pBoxGap->GetSide2());
@@ -474,7 +474,7 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
     else if (nullptr != pConcentricGap)
     {
         FieldMap fields;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pConcentricGapFactory->Write(pConcentricGap, fields));
+        RETURN_ON_ERROR(m_pConcentricGapFactory->Write(pConcentricGap, fields));
         fields.Set("minZCoordinate", pConcentricGap->GetMinZCoordinate());
         fields.Set("maxZCoordinate", pConcentricGap->GetMaxZCoordinate());
         fields.Set("innerRCoordinate", pConcentricGap->GetInnerRCoordinate());
@@ -517,7 +517,7 @@ StatusCode XmlFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
     fields.Set("parentAddress", pCaloHit->GetParentAddress());
     fields.Set("cellSize0", pCaloHit->GetCellSize0());
     fields.Set("cellSize1", pCaloHit->GetCellSize1());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Write(pCaloHit, fields));
+    RETURN_ON_ERROR(m_pCaloHitFactory->Write(pCaloHit, fields));
 
     return this->WriteComponent("CaloHit", GetSchemaVersion(CALO_HIT_COMPONENT), fields);
 }
@@ -530,7 +530,7 @@ StatusCode XmlFileWriter::WriteTrack(const Track *const pTrack)
         return STATUS_CODE_FAILURE;
 
     FieldMap fields;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pTrackFactory->Write(pTrack, fields));
+    RETURN_ON_ERROR(m_pTrackFactory->Write(pTrack, fields));
 
     fields.Set("d0", pTrack->GetD0());
     fields.Set("z0", pTrack->GetZ0());
@@ -559,7 +559,7 @@ StatusCode XmlFileWriter::WriteMCParticle(const MCParticle *const pMCParticle)
         return STATUS_CODE_FAILURE;
 
     FieldMap fields;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pMCParticleFactory->Write(pMCParticle, fields));
+    RETURN_ON_ERROR(m_pMCParticleFactory->Write(pMCParticle, fields));
 
     fields.Set("energy", pMCParticle->GetEnergy());
     fields.Set("momentum", pMCParticle->GetMomentum());

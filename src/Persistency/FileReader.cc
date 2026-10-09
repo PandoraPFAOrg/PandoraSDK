@@ -151,7 +151,7 @@ StatusCode FileReader::ReadGlobalHeader()
         }
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadHeader());
+    RETURN_ON_ERROR(this->ReadHeader());
 
     if (HEADER_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
@@ -177,10 +177,10 @@ StatusCode FileReader::ReadGeometry()
 {
     if (GEOMETRY_CONTAINER != this->GetNextContainerId())
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextGeometry());
+        RETURN_ON_ERROR(this->GoToNextGeometry());
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadHeader());
+    RETURN_ON_ERROR(this->ReadHeader());
 
     if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
@@ -206,10 +206,10 @@ StatusCode FileReader::ReadEvent()
 {
     if (EVENT_CONTAINER != this->GetNextContainerId())
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextEvent());
+        RETURN_ON_ERROR(this->GoToNextEvent());
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadHeader());
+    RETURN_ON_ERROR(this->ReadHeader());
 
     try
     {
@@ -232,7 +232,7 @@ StatusCode FileReader::GoToGlobalHeader()
 {
     do
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextContainer());
+        RETURN_ON_ERROR(this->GoToNextContainer());
     } while (HEADER_CONTAINER != this->GetNextContainerId());
 
     return STATUS_CODE_SUCCESS;
@@ -244,7 +244,7 @@ StatusCode FileReader::GoToNextGeometry()
 {
     do
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextContainer());
+        RETURN_ON_ERROR(this->GoToNextContainer());
     } while (GEOMETRY_CONTAINER != this->GetNextContainerId());
 
     return STATUS_CODE_SUCCESS;
@@ -256,7 +256,7 @@ StatusCode FileReader::GoToNextEvent()
 {
     do
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextContainer());
+        RETURN_ON_ERROR(this->GoToNextContainer());
     } while (EVENT_CONTAINER != this->GetNextContainerId());
 
     return STATUS_CODE_SUCCESS;

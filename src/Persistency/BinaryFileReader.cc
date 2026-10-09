@@ -44,13 +44,13 @@ BinaryFileReader::~BinaryFileReader()
 StatusCode BinaryFileReader::ReadHeader()
 {
     std::string fileHash;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(fileHash));
+    RETURN_ON_ERROR(this->ReadVariable(fileHash));
 
     if (PANDORA_FILE_HASH != fileHash)
         return STATUS_CODE_FAILURE;
 
     uint32_t formatVersion(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(formatVersion));
+    RETURN_ON_ERROR(this->ReadVariable(formatVersion));
 
     if (PANDORA_BINARY_FORMAT_VERSION != formatVersion)
     {
@@ -59,13 +59,13 @@ StatusCode BinaryFileReader::ReadHeader()
         return STATUS_CODE_FAILURE;
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(m_containerId));
+    RETURN_ON_ERROR(this->ReadVariable(m_containerId));
 
     if ((HEADER_CONTAINER != m_containerId) && (EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     m_containerPosition = m_fileStream.tellg();
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(m_containerSize));
+    RETURN_ON_ERROR(this->ReadVariable(m_containerSize));
 
     if (0 == m_containerSize)
         return STATUS_CODE_FAILURE;
@@ -79,7 +79,7 @@ StatusCode BinaryFileReader::ReadHeader()
 
 StatusCode BinaryFileReader::GoToNextContainer()
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadHeader());
+    RETURN_ON_ERROR(this->ReadHeader());
     m_fileStream.seekg(m_containerPosition + m_containerSize, std::ios::beg);
 
     if (!m_fileStream.good())
@@ -104,13 +104,13 @@ ContainerId BinaryFileReader::GetNextContainerId()
         throw StatusCodeException(STATUS_CODE_FAILURE);
 
     uint32_t formatVersion(0);
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(formatVersion));
+    THROW_ON_ERROR(this->ReadVariable(formatVersion));
 
     if (PANDORA_BINARY_FORMAT_VERSION != formatVersion)
         throw StatusCodeException(STATUS_CODE_FAILURE);
 
     ContainerId containerId(UNKNOWN_CONTAINER);
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(containerId));
+    THROW_ON_ERROR(this->ReadVariable(containerId));
 
     m_fileStream.seekg(initialPosition, std::ios::beg);
 
@@ -136,7 +136,7 @@ StatusCode BinaryFileReader::GoToGeometry(const unsigned int geometryNumber)
 
     while (nGeometriesRead < static_cast<int>(geometryNumber))
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextGeometry());
+        RETURN_ON_ERROR(this->GoToNextGeometry());
         ++nGeometriesRead;
     }
 
@@ -159,7 +159,7 @@ StatusCode BinaryFileReader::GoToEvent(const unsigned int eventNumber)
 
     while (nEventsRead < static_cast<int>(eventNumber))
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextEvent());
+        RETURN_ON_ERROR(this->GoToNextEvent());
         ++nEventsRead;
     }
 
@@ -172,9 +172,9 @@ StatusCode BinaryFileReader::ReadComponentFields(ComponentId &componentId, unsig
 {
     // Read component header
     uint32_t cid(0), sver(0), numFields(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(cid));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(sver));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(numFields));
+    RETURN_ON_ERROR(this->ReadVariable(cid));
+    RETURN_ON_ERROR(this->ReadVariable(sver));
+    RETURN_ON_ERROR(this->ReadVariable(numFields));
 
     componentId = static_cast<ComponentId>(cid);
     schemaVersion = static_cast<unsigned int>(sver);
@@ -183,10 +183,10 @@ StatusCode BinaryFileReader::ReadComponentFields(ComponentId &componentId, unsig
     for (uint32_t i = 0; i < numFields; ++i)
     {
         std::string tag;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadTagReference(tag));
+        RETURN_ON_ERROR(this->ReadTagReference(tag));
 
         uint32_t dataLen(0);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(dataLen));
+        RETURN_ON_ERROR(this->ReadVariable(dataLen));
 
         std::vector<unsigned char> data(dataLen);
         m_fileStream.read(reinterpret_cast<char *>(data.data()), dataLen);
@@ -199,7 +199,7 @@ StatusCode BinaryFileReader::ReadComponentFields(ComponentId &componentId, unsig
 
     // Verify end marker
     uint32_t marker(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(marker));
+    RETURN_ON_ERROR(this->ReadVariable(marker));
 
     if (COMPONENT_END_MARKER != marker)
     {
@@ -378,7 +378,7 @@ StatusCode BinaryFileReader::ReadSubDetector(const FieldMap &fields)
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pSubDetectorFactory->Read(*pParameters, fields));
+        THROW_ON_ERROR(m_pSubDetectorFactory->Read(*pParameters, fields));
 
         pParameters->m_subDetectorName = fields.GetOrDefault<std::string>("subDetectorName", std::string());
         pParameters->m_subDetectorType = fields.GetOrDefault<SubDetectorType>("subDetectorType", SUB_DETECTOR_OTHER);
@@ -405,7 +405,7 @@ StatusCode BinaryFileReader::ReadSubDetector(const FieldMap &fields)
             pParameters->m_layerParametersVector.push_back(layerParameters);
         }
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, *pParameters, *m_pSubDetectorFactory));
+        THROW_ON_ERROR(PandoraApi::Geometry::SubDetector::Create(*m_pPandora, *pParameters, *m_pSubDetectorFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -443,9 +443,9 @@ StatusCode BinaryFileReader::ReadLArTPC(const FieldMap &fields)
         pParameters->m_wireAngleW = fields.GetOrDefault<float>("wireAngleW", 0.f);
         pParameters->m_sigmaUVW = fields.GetOrDefault<float>("sigmaUVW", 0.f);
         pParameters->m_isDriftInPositiveX = fields.GetOrDefault<bool>("isDriftInPositiveX", false);
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Read(*pParameters, fields));
+        THROW_ON_ERROR(m_pLArTPCFactory->Read(*pParameters, fields));
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LArTPC::Create(*m_pPandora, *pParameters, *m_pLArTPCFactory));
+        THROW_ON_ERROR(PandoraApi::Geometry::LArTPC::Create(*m_pPandora, *pParameters, *m_pLArTPCFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -468,7 +468,7 @@ StatusCode BinaryFileReader::ReadLineGap(const FieldMap &fields)
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Read(*pParameters, fields));
+        THROW_ON_ERROR(m_pLineGapFactory->Read(*pParameters, fields));
 
         pParameters->m_lineGapType = fields.GetOrDefault<LineGapType>("lineGapType", TPC_WIRE_GAP_VIEW_U);
         pParameters->m_lineStartX = fields.GetOrDefault<float>("lineStartX", 0.f);
@@ -476,7 +476,7 @@ StatusCode BinaryFileReader::ReadLineGap(const FieldMap &fields)
         pParameters->m_lineStartZ = fields.GetOrDefault<float>("lineStartZ", 0.f);
         pParameters->m_lineEndZ = fields.GetOrDefault<float>("lineEndZ", 0.f);
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*m_pPandora, *pParameters, *m_pLineGapFactory));
+        THROW_ON_ERROR(PandoraApi::Geometry::LineGap::Create(*m_pPandora, *pParameters, *m_pLineGapFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -499,14 +499,14 @@ StatusCode BinaryFileReader::ReadBoxGap(const FieldMap &fields)
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Read(*pParameters, fields));
+        THROW_ON_ERROR(m_pBoxGapFactory->Read(*pParameters, fields));
 
         pParameters->m_vertex = fields.GetOrDefault<CartesianVector>("vertex", CartesianVector(0.f, 0.f, 0.f));
         pParameters->m_side1 = fields.GetOrDefault<CartesianVector>("side1", CartesianVector(0.f, 0.f, 0.f));
         pParameters->m_side2 = fields.GetOrDefault<CartesianVector>("side2", CartesianVector(0.f, 0.f, 0.f));
         pParameters->m_side3 = fields.GetOrDefault<CartesianVector>("side3", CartesianVector(0.f, 0.f, 0.f));
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::BoxGap::Create(*m_pPandora, *pParameters, *m_pBoxGapFactory));
+        THROW_ON_ERROR(PandoraApi::Geometry::BoxGap::Create(*m_pPandora, *pParameters, *m_pBoxGapFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -529,7 +529,7 @@ StatusCode BinaryFileReader::ReadConcentricGap(const FieldMap &fields)
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pConcentricGapFactory->Read(*pParameters, fields));
+        THROW_ON_ERROR(m_pConcentricGapFactory->Read(*pParameters, fields));
 
         pParameters->m_minZCoordinate = fields.GetOrDefault<float>("minZCoordinate", 0.f);
         pParameters->m_maxZCoordinate = fields.GetOrDefault<float>("maxZCoordinate", 0.f);
@@ -540,7 +540,7 @@ StatusCode BinaryFileReader::ReadConcentricGap(const FieldMap &fields)
         pParameters->m_outerPhiCoordinate = fields.GetOrDefault<float>("outerPhiCoordinate", 0.f);
         pParameters->m_outerSymmetryOrder = fields.GetOrDefault<unsigned int>("outerSymmetryOrder", 0u);
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::ConcentricGap::Create(*m_pPandora, *pParameters, *m_pConcentricGapFactory));
+        THROW_ON_ERROR(PandoraApi::Geometry::ConcentricGap::Create(*m_pPandora, *pParameters, *m_pConcentricGapFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -583,9 +583,9 @@ StatusCode BinaryFileReader::ReadCaloHit(const FieldMap &fields)
         pParameters->m_pParentAddress = fields.GetOrDefault<const void *>("parentAddress", nullptr);
         pParameters->m_cellSize0 = fields.GetOrDefault<float>("cellSize0", 0.f);
         pParameters->m_cellSize1 = fields.GetOrDefault<float>("cellSize1", 0.f);
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Read(*pParameters, fields));
+        THROW_ON_ERROR(m_pCaloHitFactory->Read(*pParameters, fields));
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::CaloHit::Create(*m_pPandora, *pParameters, *m_pCaloHitFactory));
+        THROW_ON_ERROR(PandoraApi::CaloHit::Create(*m_pPandora, *pParameters, *m_pCaloHitFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -608,7 +608,7 @@ StatusCode BinaryFileReader::ReadTrack(const FieldMap &fields)
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pTrackFactory->Read(*pParameters, fields));
+        THROW_ON_ERROR(m_pTrackFactory->Read(*pParameters, fields));
 
         pParameters->m_d0 = fields.GetOrDefault<float>("d0", 0.f);
         pParameters->m_z0 = fields.GetOrDefault<float>("z0", 0.f);
@@ -627,7 +627,7 @@ StatusCode BinaryFileReader::ReadTrack(const FieldMap &fields)
         pParameters->m_canFormClusterlessPfo = fields.GetOrDefault<bool>("canFormClusterlessPfo", false);
         pParameters->m_pParentAddress = fields.GetOrDefault<const void *>("parentAddress", nullptr);
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Track::Create(*m_pPandora, *pParameters, *m_pTrackFactory));
+        THROW_ON_ERROR(PandoraApi::Track::Create(*m_pPandora, *pParameters, *m_pTrackFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -650,7 +650,7 @@ StatusCode BinaryFileReader::ReadMCParticle(const FieldMap &fields)
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pMCParticleFactory->Read(*pParameters, fields));
+        THROW_ON_ERROR(m_pMCParticleFactory->Read(*pParameters, fields));
 
         pParameters->m_energy = fields.GetOrDefault<float>("energy", 0.f);
         pParameters->m_momentum = fields.GetOrDefault<CartesianVector>("momentum", CartesianVector(0.f, 0.f, 0.f));
@@ -660,7 +660,7 @@ StatusCode BinaryFileReader::ReadMCParticle(const FieldMap &fields)
         pParameters->m_mcParticleType = fields.GetOrDefault<MCParticleType>("mcParticleType", MC_3D);
         pParameters->m_pParentAddress = fields.GetOrDefault<const void *>("uid", nullptr);
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::MCParticle::Create(*m_pPandora, *pParameters, *m_pMCParticleFactory));
+        THROW_ON_ERROR(PandoraApi::MCParticle::Create(*m_pPandora, *pParameters, *m_pMCParticleFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -724,7 +724,7 @@ StatusCode BinaryFileReader::ReadEventInformation(const FieldMap &fields)
 StatusCode BinaryFileReader::ReadTagReference(std::string &tag)
 {
     uint16_t tagId(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(tagId));
+    RETURN_ON_ERROR(this->ReadVariable(tagId));
 
     if (NEW_TAG_MARKER != tagId)
     {
@@ -740,7 +740,7 @@ StatusCode BinaryFileReader::ReadTagReference(std::string &tag)
     }
 
     uint16_t tagLen(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(tagLen));
+    RETURN_ON_ERROR(this->ReadVariable(tagLen));
 
     tag.assign(tagLen, '\0');
     if (tagLen > 0)
