@@ -68,13 +68,13 @@ BinaryFileWriter::~BinaryFileWriter()
 
 StatusCode BinaryFileWriter::WriteHeader(const ContainerId containerId)
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(PANDORA_FILE_HASH));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(PANDORA_BINARY_FORMAT_VERSION));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(containerId));
+    RETURN_ON_ERROR(this->WriteVariable(PANDORA_FILE_HASH));
+    RETURN_ON_ERROR(this->WriteVariable(PANDORA_BINARY_FORMAT_VERSION));
+    RETURN_ON_ERROR(this->WriteVariable(containerId));
 
     m_containerPosition = m_fileStream.tellp();
     const std::ofstream::pos_type dummyContainerSize(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(dummyContainerSize));
+    RETURN_ON_ERROR(this->WriteVariable(dummyContainerSize));
 
     m_containerId = containerId;
 
@@ -96,7 +96,7 @@ StatusCode BinaryFileWriter::WriteFooter()
                                                                            : GEOMETRY_END_COMPONENT;
 
     const FieldMap emptyFields;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteComponent(endComponentId, 0u, emptyFields));
+    RETURN_ON_ERROR(this->WriteComponent(endComponentId, 0u, emptyFields));
 
     m_containerId = UNKNOWN_CONTAINER;
 
@@ -106,7 +106,7 @@ StatusCode BinaryFileWriter::WriteFooter()
     if (!m_fileStream.good())
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(containerSize));
+    RETURN_ON_ERROR(this->WriteVariable(containerSize));
     m_fileStream.seekp(0, std::ios::end);
 
     if (!m_fileStream.good())
@@ -126,9 +126,9 @@ StatusCode BinaryFileWriter::WriteComponent(const ComponentId componentId, const
     const uint32_t sver = static_cast<uint32_t>(schemaVersion);
     const uint32_t numFields = static_cast<uint32_t>(allFields.size());
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(cid));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(sver));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(numFields));
+    RETURN_ON_ERROR(this->WriteVariable(cid));
+    RETURN_ON_ERROR(this->WriteVariable(sver));
+    RETURN_ON_ERROR(this->WriteVariable(numFields));
 
     for (const auto &entry : allFields)
     {
@@ -137,16 +137,16 @@ StatusCode BinaryFileWriter::WriteComponent(const ComponentId componentId, const
 
         const uint32_t dataLen = static_cast<uint32_t>(data.size());
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteTagReference(tag));
+        RETURN_ON_ERROR(this->WriteTagReference(tag));
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(dataLen));
+        RETURN_ON_ERROR(this->WriteVariable(dataLen));
         m_fileStream.write(reinterpret_cast<const char *>(data.data()), dataLen);
 
         if (!m_fileStream.good())
             return STATUS_CODE_FAILURE;
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(COMPONENT_END_MARKER));
+    RETURN_ON_ERROR(this->WriteVariable(COMPONENT_END_MARKER));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -155,14 +155,14 @@ StatusCode BinaryFileWriter::WriteComponent(const ComponentId componentId, const
 
 StatusCode BinaryFileWriter::WriteGlobalHeader()
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteHeader(HEADER_CONTAINER));
+    RETURN_ON_ERROR(this->WriteHeader(HEADER_CONTAINER));
 
     if (HEADER_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteMetadata());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSchemaRegistry());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteFooter());
+    RETURN_ON_ERROR(this->WriteMetadata());
+    RETURN_ON_ERROR(this->WriteSchemaRegistry());
+    RETURN_ON_ERROR(this->WriteFooter());
 
     return STATUS_CODE_SUCCESS;
 }
@@ -183,7 +183,7 @@ StatusCode BinaryFileWriter::WriteMetadata()
     for (const auto &kv : m_metadata.m_userParameters)
         fields.Set(std::string("userParam:") + kv.first, kv.second);
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteComponent(METADATA_COMPONENT, 1u, fields));
+    RETURN_ON_ERROR(this->WriteComponent(METADATA_COMPONENT, 1u, fields));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -203,7 +203,7 @@ StatusCode BinaryFileWriter::WriteSchemaRegistry()
         fields.Set(tag, entry.m_schemaVersion);
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteComponent(SCHEMA_REGISTRY_COMPONENT, 0u, fields));
+    RETURN_ON_ERROR(this->WriteComponent(SCHEMA_REGISTRY_COMPONENT, 0u, fields));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -216,7 +216,7 @@ StatusCode BinaryFileWriter::WriteSubDetector(const SubDetector *const pSubDetec
         return STATUS_CODE_FAILURE;
 
     FieldMap fields;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pSubDetectorFactory->Write(pSubDetector, fields));
+    RETURN_ON_ERROR(m_pSubDetectorFactory->Write(pSubDetector, fields));
 
     fields.Set("subDetectorName", pSubDetector->GetSubDetectorName());
     fields.Set("subDetectorType", pSubDetector->GetSubDetectorType());
@@ -273,7 +273,7 @@ StatusCode BinaryFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
     fields.Set("wireAngleW", pLArTPC->GetWireAngleW());
     fields.Set("sigmaUVW", pLArTPC->GetSigmaUVW());
     fields.Set("isDriftInPositiveX", pLArTPC->IsDriftInPositiveX());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Write(pLArTPC, fields));
+    RETURN_ON_ERROR(m_pLArTPCFactory->Write(pLArTPC, fields));
 
     return this->WriteComponent(LAR_TPC_COMPONENT, GetSchemaVersion(LAR_TPC_COMPONENT), fields);
 }
@@ -292,7 +292,7 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
     if (nullptr != pLineGap)
     {
         FieldMap fields;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, fields));
+        RETURN_ON_ERROR(m_pLineGapFactory->Write(pLineGap, fields));
 
         fields.Set("lineGapType", pLineGap->GetLineGapType());
         fields.Set("lineStartX", pLineGap->GetLineStartX());
@@ -305,7 +305,7 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
     else if (nullptr != pBoxGap)
     {
         FieldMap fields;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Write(pBoxGap, fields));
+        RETURN_ON_ERROR(m_pBoxGapFactory->Write(pBoxGap, fields));
 
         fields.Set("vertex", pBoxGap->GetVertex());
         fields.Set("side1", pBoxGap->GetSide1());
@@ -317,7 +317,7 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
     else if (nullptr != pConcentricGap)
     {
         FieldMap fields;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pConcentricGapFactory->Write(pConcentricGap, fields));
+        RETURN_ON_ERROR(m_pConcentricGapFactory->Write(pConcentricGap, fields));
 
         fields.Set("minZCoordinate", pConcentricGap->GetMinZCoordinate());
         fields.Set("maxZCoordinate", pConcentricGap->GetMaxZCoordinate());
@@ -362,7 +362,7 @@ StatusCode BinaryFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
     fields.Set("parentAddress", pCaloHit->GetParentAddress());
     fields.Set("cellSize0", pCaloHit->GetCellSize0());
     fields.Set("cellSize1", pCaloHit->GetCellSize1());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Write(pCaloHit, fields));
+    RETURN_ON_ERROR(m_pCaloHitFactory->Write(pCaloHit, fields));
 
     return this->WriteComponent(CALO_HIT_COMPONENT, GetSchemaVersion(CALO_HIT_COMPONENT), fields);
 }
@@ -375,7 +375,7 @@ StatusCode BinaryFileWriter::WriteTrack(const Track *const pTrack)
         return STATUS_CODE_FAILURE;
 
     FieldMap fields;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pTrackFactory->Write(pTrack, fields));
+    RETURN_ON_ERROR(m_pTrackFactory->Write(pTrack, fields));
 
     fields.Set("d0", pTrack->GetD0());
     fields.Set("z0", pTrack->GetZ0());
@@ -404,7 +404,7 @@ StatusCode BinaryFileWriter::WriteMCParticle(const MCParticle *const pMCParticle
         return STATUS_CODE_FAILURE;
 
     FieldMap fields;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pMCParticleFactory->Write(pMCParticle, fields));
+    RETURN_ON_ERROR(m_pMCParticleFactory->Write(pMCParticle, fields));
 
     fields.Set("energy", pMCParticle->GetEnergy());
     fields.Set("momentum", pMCParticle->GetMomentum());
@@ -468,8 +468,8 @@ StatusCode BinaryFileWriter::WriteTagReference(const std::string &tag)
     const uint16_t tagId(static_cast<uint16_t>(m_tagDictionary.size()));
     const uint16_t tagLen(static_cast<uint16_t>(tag.size()));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(NEW_TAG_MARKER));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(tagLen));
+    RETURN_ON_ERROR(this->WriteVariable(NEW_TAG_MARKER));
+    RETURN_ON_ERROR(this->WriteVariable(tagLen));
     m_fileStream.write(tag.data(), tagLen);
 
     if (!m_fileStream.good())
