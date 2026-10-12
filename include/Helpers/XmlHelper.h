@@ -45,16 +45,6 @@ public:
     static StatusCode ReadValue(const TiXmlHandle &xmlHandle, const std::string &xmlElementName, T &t);
 
     /**
-     *  @brief  Read a required value from an xml element
-     *
-     *  @param  xmlHandle the relevant xml handle
-     *  @param  xmlElementName the name of the xml element to examine
-     *  @param  t to receive the value
-     */
-    template <typename T>
-    static StatusCode ReadRequired(const TiXmlHandle &xmlHandle, const std::string &xmlElementName, T &t);
-
-    /**
      *  @brief  Read an optional value from an xml element
      *
      *  @param  xmlHandle the relevant xml handle
