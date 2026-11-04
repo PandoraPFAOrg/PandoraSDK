@@ -75,6 +75,18 @@ private:
     StatusCode ResetEvent() const;
 
     /**
+     *  @brief  Reset event, but keep the mc particles (see PandoraApi::ResetKeepingMCParticles)
+     */
+    StatusCode ResetEventKeepingMCParticles() const;
+
+    /**
+     *  @brief  Reset the managers for the next event
+     *
+     *  @param  resetMCParticles whether the mc manager should also delete the mc particles
+     */
+    StatusCode ResetManagers(const bool resetMCParticles) const;
+
+    /**
      *  @brief  Constructor
      * 
      *  @param  pPandora address of the pandora object to interface
