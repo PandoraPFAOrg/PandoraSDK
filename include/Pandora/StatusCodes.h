@@ -18,60 +18,6 @@
     #include <execinfo.h>
 #endif
 
-namespace pandora
-{
-namespace deprecation_markers
-{
-    [[deprecated("Legacy macro.")]]
-    inline void PANDORA_RETURN_is_deprecated() {}
-
-    [[deprecated("Legacy macro. Use 'RETURN_IF' instead.")]]
-    inline void PANDORA_RETURN_IF_is_deprecated() {}
-
-    [[deprecated("Legacy macro. Use 'RETURN_ON_ERROR' instead.")]]
-    inline void PANDORA_RETURN_RESULT_IF_is_deprecated() {}
-
-    [[deprecated("Legacy macro. Use 'RETURN_ON_ERROR_EXCEPT' instead.")]]
-    inline void PANDORA_RETURN_RESULT_IF_AND_IF_is_deprecated() {}
-
-    [[deprecated("Legacy macro.")]]
-    inline void PANDORA_THROW_is_deprecated() {}
-
-    [[deprecated("Legacy macro. Use 'THROW_IF' instead.")]]
-    inline void PANDORA_THROW_IF_is_deprecated() {}
-
-    [[deprecated("Legacy macro. Use 'THROW_ON_ERROR' instead.")]]
-    inline void PANDORA_THROW_RESULT_IF_is_deprecated() {}
-
-    [[deprecated("Legacy macro. Use 'THROW_ON_ERROR_EXCEPT' instead.")]]
-    inline void PANDORA_THROW_RESULT_IF_AND_IF_is_deprecated() {}
-}
-}
-
-#if defined(__clang__)
-    #define PANDORA_LEGACY_DEPRECATION_PUSH                                                               \
-        _Pragma("clang diagnostic push")                                                                  \
-        _Pragma("clang diagnostic warning \"-Wdeprecated-declarations\"")
-    #define PANDORA_LEGACY_DEPRECATION_POP                                                                \
-        _Pragma("clang diagnostic pop")
-#elif defined(__GNUC__)
-    #define PANDORA_LEGACY_DEPRECATION_PUSH                                                               \
-        _Pragma("GCC diagnostic push")                                                                    \
-        _Pragma("GCC diagnostic warning \"-Wdeprecated-declarations\"")
-    #define PANDORA_LEGACY_DEPRECATION_POP                                                                \
-        _Pragma("GCC diagnostic pop")
-#else
-    #define PANDORA_LEGACY_DEPRECATION_PUSH
-    #define PANDORA_LEGACY_DEPRECATION_POP
-#endif
-
-#define PANDORA_LEGACY_DEPRECATION_MARK(CallExpr)                                                          \
-{                                                                                                          \
-    PANDORA_LEGACY_DEPRECATION_PUSH                                                                        \
-    CallExpr;                                                                                              \
-    PANDORA_LEGACY_DEPRECATION_POP                                                                         \
-}
-
 namespace pandora::detail
 {
     inline void LogStatusAction(const std::string_view expression, const std::string_view action, const std::string_view status,
@@ -93,14 +39,12 @@ namespace pandora::detail
 
 #define PANDORA_RETURN(StatusCode)                                                                                                        \
 {                                                                                                                                         \
-    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_RETURN_is_deprecated())                                         \
     pandora::detail::LogLocation(__FUNCTION__, __FILE__, __LINE__);                                                                       \
     return StatusCode;                                                                                                                    \
 }
 
 #define PANDORA_RETURN_IF(StatusCode, Condition)                                                                                          \
 {                                                                                                                                         \
-    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_RETURN_IF_is_deprecated())                                      \
     if (Condition)                                                                                                                        \
     {                                                                                                                                     \
         pandora::detail::LogStatusAction(#Condition, "return", StatusCodeToString(StatusCode), __FUNCTION__, __FILE__, __LINE__);         \
@@ -110,7 +54,6 @@ namespace pandora::detail
 
 #define PANDORA_RETURN_RESULT_IF(StatusCode1, Operator, Command)                                                                          \
 {                                                                                                                                         \
-    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_RETURN_RESULT_IF_is_deprecated())                               \
     const pandora::StatusCode statusCode(Command);                                                                                        \
     if (statusCode Operator StatusCode1)                                                                                                  \
     {                                                                                                                                     \
@@ -121,7 +64,6 @@ namespace pandora::detail
 
 #define PANDORA_RETURN_RESULT_IF_AND_IF(StatusCode1, StatusCode2, Operator, Command)                                                      \
 {                                                                                                                                         \
-    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_RETURN_RESULT_IF_AND_IF_is_deprecated())                        \
     const pandora::StatusCode statusCode(Command);                                                                                        \
     if ((statusCode Operator StatusCode1) && (statusCode Operator StatusCode2))                                                           \
     {                                                                                                                                     \
@@ -132,14 +74,12 @@ namespace pandora::detail
 
 #define PANDORA_THROW(StatusCode)                                                                                                         \
 {                                                                                                                                         \
-    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_THROW_is_deprecated())                                          \
     pandora::detail::LogLocation(__FUNCTION__, __FILE__, __LINE__);                                                                       \
     throw pandora::StatusCodeException(StatusCode);                                                                                       \
 }
 
 #define PANDORA_THROW_IF(StatusCode, Condition)                                                                                           \
 {                                                                                                                                         \
-    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_THROW_IF_is_deprecated())                                       \
     if (Condition)                                                                                                                        \
     {                                                                                                                                     \
         pandora::detail::LogStatusAction(#Condition, "throw", StatusCodeToString(StatusCode), __FUNCTION__, __FILE__, __LINE__);          \
@@ -149,7 +89,6 @@ namespace pandora::detail
 
 #define PANDORA_THROW_RESULT_IF(StatusCode1, Operator, Command)                                                                           \
 {                                                                                                                                         \
-    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_THROW_RESULT_IF_is_deprecated())                                \
     const pandora::StatusCode statusCode(Command);                                                                                        \
     if (statusCode Operator StatusCode1)                                                                                                  \
     {                                                                                                                                     \
@@ -160,7 +99,6 @@ namespace pandora::detail
 
 #define PANDORA_THROW_RESULT_IF_AND_IF(StatusCode1, StatusCode2, Operator, Command)                                                       \
 {                                                                                                                                         \
-    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_THROW_RESULT_IF_AND_IF_is_deprecated())                         \
     const pandora::StatusCode statusCode(Command);                                                                                        \
     if ((statusCode Operator StatusCode1) && (statusCode Operator StatusCode2))                                                           \
     {                                                                                                                                     \
