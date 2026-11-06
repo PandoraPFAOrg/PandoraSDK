@@ -194,7 +194,7 @@ template <>
 inline StatusCode BinaryFileWriter::WriteVariable(const std::string &t)
 {
     const uint32_t stringSize(static_cast<uint32_t>(t.size()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(stringSize));
+    RETURN_ON_ERROR(this->WriteVariable(stringSize));
     m_fileStream.write(t.c_str(), stringSize);
 
     if (!m_fileStream.good())
