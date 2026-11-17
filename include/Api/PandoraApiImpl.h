@@ -198,6 +198,11 @@ private:
     StatusCode ResetEvent() const;
 
     /**
+     *  @brief  Reset pandora to process another event, but keep the mc particles
+     */
+    StatusCode ResetEventKeepingMCParticles() const;
+
+    /**
      *  @brief  Constructor
      *
      *  @param  pPandora address of the pandora object to interface

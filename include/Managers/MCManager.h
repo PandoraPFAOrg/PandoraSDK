@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/include/Managers/MCManager.h
- * 
+ *
  *  @brief  Header file for the mc particle manager class.
- * 
+ *
  *  $Log: $
  */
 #ifndef PANDORA_MC_MANAGER_H
@@ -24,7 +24,7 @@ class MCManager : public InputObjectManager<MCParticle>
 public:
     /**
      *  @brief  Constructor
-     * 
+     *
      *  @param  pPandora address of the associated pandora object
      */
     MCManager(const Pandora *const pPandora);
@@ -35,9 +35,10 @@ public:
     ~MCManager();
 
 private:
+
     /**
      *  @brief  Create a mc particle
-     * 
+     *
      *  @param  parameters the mc particle parameters
      *  @param  pMCParticle address of the mc particle
      *  @param  factory the factory that performs the object allocation
@@ -52,7 +53,7 @@ private:
 
     /**
      *  @brief  Set mc particle relationship
-     * 
+     *
      *  @param  parentUid the parent unique identifier
      *  @param  daughterUid the daughter unique identifier
      */
@@ -60,7 +61,7 @@ private:
 
     /**
      *  @brief  Set calo hit to mc particle relationship
-     * 
+     *
      *  @param  caloHitUid the calo hit unique identifier
      *  @param  mcParticleUid the mc particle unique identifier
      *  @param  mcParticleWeight weighting to assign to the mc particle
@@ -69,7 +70,7 @@ private:
 
     /**
      *  @brief  Set track to mc particle relationship
-     * 
+     *
      *  @param  trackUid the track unique identifier
      *  @param  mcParticleUid the mc particle unique identifier
      *  @param  mcParticleWeight weighting to assign to the mc particle
@@ -87,7 +88,7 @@ private:
     StatusCode SelectPfoTargets();
 
     /**
-     *  @brief  Apply mc pfo selection rules 
+     *  @brief  Apply mc pfo selection rules
      *
      *  @param  mcRootParticle address of the mc root particle
      *  @param  mcPfoSet set of all MCPFOs selected so far
@@ -96,7 +97,7 @@ private:
 
     /**
      *  @brief  Set pfo target for a mc tree
-     * 
+     *
      *  @param  pMCParticle address of a particle in the mc tree
      *  @param  pPfoTarget address of the pfo target
      *  @param  onlyDaughters if "true" go through daughters only, if false go through parents as well
@@ -105,14 +106,14 @@ private:
 
    /**
      *  @brief  Create a map relating calo hit uid to mc pfo target
-     * 
+     *
      *  @param  caloHitToPfoTargetMap to receive the calo hit uid to mc pfo target map
      */
     StatusCode CreateCaloHitToPfoTargetsMap(UidToMCParticleWeightMap &caloHitToPfoTargetsMap) const;
 
    /**
      *  @brief  Create a map relating track uid to mc pfo target
-     * 
+     *
      *  @param  trackToPfoTargetMap to receive the track uid to mc pfo target map
      */
     StatusCode CreateTrackToPfoTargetsMap(UidToMCParticleWeightMap &trackToPfoTargetsMap) const;
@@ -129,10 +130,15 @@ private:
 
     /**
      *  @brief  Remove all parent/daughter particle links from a mc particle and from its (previously) linked particles
-     * 
+     *
      *  @param  pMCParticle address of the mc particle
      */
     StatusCode RemoveMCParticleRelationships(const MCParticle *const pMCParticle) const;
+
+    /**
+     *  @brief  Reset the manager for the next event, whilst keeping MC particles (and their relationships) intact
+     */
+    StatusCode ResetForNextEventKeepingMCParticles();
 
     typedef std::unordered_map<Uid, float> UidToWeightMap;
     typedef std::unordered_map<Uid, UidToWeightMap> ObjectRelationMap;
@@ -140,7 +146,7 @@ private:
 
     /**
      *  @brief  Set an object (e.g. calo hit or track) to mc particle relationship
-     * 
+     *
      *  @param  uid the unique identifier of the object
      *  @param  mcParticleUid the mc particle unique identifier
      *  @param  mcParticleWeight weighting to assign to the mc particle
@@ -151,7 +157,7 @@ private:
 
    /**
      *  @brief  Create a map relating an object (calo hit or track) uid to mc pfo targets
-     * 
+     *
      *  @param  uidToMCParticleWeightMap to receive the calo hit uid to mc pfo target map
      *  @param  objectRelationMap the object relation map containing the information
      */

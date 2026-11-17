@@ -68,6 +68,16 @@ StatusCode MCManager::Create(const object_creation::MCParticle::Parameters &para
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode MCManager::ResetForNextEventKeepingMCParticles()
+{
+    m_caloHitToMCParticleMap.clear();
+    m_trackToMCParticleMap.clear();
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode MCManager::EraseAllContent()
 {
     m_uidToMCParticleMap.clear();

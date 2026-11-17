@@ -249,6 +249,15 @@ public:
      *  @param  pandora the pandora instance to reset
      */
     static pandora::StatusCode Reset(const pandora::Pandora &pandora);
+
+    /**
+     *  @brief  Reset pandora to process another event, but keep the mc particles and their parent-daughter relationships, so they
+     *          do not need to be passed in again (e.g. when an instance is reused for several slices of the same event). The calo
+     *          hit and track to mc particle relationships are cleared, as the hits and tracks they refer to are deleted by the reset.
+     *
+     *  @param  pandora the pandora instance to reset
+     */
+    static pandora::StatusCode ResetKeepingMCParticles(const pandora::Pandora &pandora);
 };
 
 #endif // #ifndef PANDORA_API_H
