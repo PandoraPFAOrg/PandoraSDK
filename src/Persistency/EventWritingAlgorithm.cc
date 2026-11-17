@@ -105,7 +105,7 @@ StatusCode EventWritingAlgorithm::Run()
 
 StatusCode EventWritingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(xmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(xmlHandle,
         "ShouldWriteGeometry", m_shouldWriteGeometry));
 
     if (m_shouldWriteGeometry)
@@ -131,7 +131,7 @@ StatusCode EventWritingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
         }
     }
 
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(xmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(xmlHandle,
         "ShouldWriteEvents", m_shouldWriteEvents));
 
     if (m_shouldWriteEvents)
@@ -157,16 +157,16 @@ StatusCode EventWritingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
         }
     }
 
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(xmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(xmlHandle,
         "ShouldOverwriteEventFile", m_shouldOverwriteEventFile));
 
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(xmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(xmlHandle,
         "ShouldOverwriteGeometryFile", m_shouldOverwriteGeometryFile));
 
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(xmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(xmlHandle,
         "ShouldWriteMCRelationships", m_shouldWriteMCRelationships));
 
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(xmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(xmlHandle,
         "ShouldWriteTrackRelationships", m_shouldWriteTrackRelationships));
 
     return STATUS_CODE_SUCCESS;

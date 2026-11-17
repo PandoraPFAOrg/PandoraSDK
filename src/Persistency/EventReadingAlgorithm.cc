@@ -172,7 +172,7 @@ StatusCode EventReadingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     }
     else
     {
-        RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(xmlHandle, "GeometryFileName", m_geometryFileName));
+        RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(xmlHandle, "GeometryFileName", m_geometryFileName));
     }
 
     if (pExternalParameters && !pExternalParameters->m_eventFileNameList.empty())
@@ -181,7 +181,7 @@ StatusCode EventReadingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     }
     else
     {
-        RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadVectorOfValues(xmlHandle, "EventFileNameList", m_eventFileNameVector));
+        RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadVectorOfValues(xmlHandle, "EventFileNameList", m_eventFileNameVector));
     }
 
     if (!m_eventFileNameVector.empty())
@@ -197,7 +197,7 @@ StatusCode EventReadingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     }
     else
     {
-        RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(xmlHandle, "SkipToEvent", m_skipToEvent));
+        RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(xmlHandle, "SkipToEvent", m_skipToEvent));
     }
 
     if (m_geometryFileName.empty() && m_eventFileName.empty())
@@ -206,7 +206,7 @@ StatusCode EventReadingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
         return STATUS_CODE_NOT_INITIALIZED;
     }
 
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(xmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(xmlHandle,
         "SkipToEvent", m_skipToEvent));
 
     return STATUS_CODE_SUCCESS;
