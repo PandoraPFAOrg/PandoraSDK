@@ -114,7 +114,7 @@ StatusCode EnergyCorrections::InitializePlugin(const TiXmlHandle *const pXmlHand
         return STATUS_CODE_FAILURE;
 
     StringVector requestedPluginNames;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadVectorOfValues(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadVectorOfValues(*pXmlHandle,
         xmlTagName, requestedPluginNames));
 
     EnergyCorrectionPluginMap &energyCorrectionPluginMap(this->GetEnergyCorrectionPluginMap(energyCorrectionType));

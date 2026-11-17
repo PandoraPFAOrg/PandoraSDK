@@ -56,7 +56,7 @@ StatusCode OrderedCaloHitList::Remove(const OrderedCaloHitList &rhs)
     {
         for (const CaloHit *const pCaloHit : *rhsEntry.second)
         {
-            RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, this->Remove(pCaloHit, rhsEntry.first));
+            RETURN_ON_ERROR_ALLOW_MISSING(this->Remove(pCaloHit, rhsEntry.first));
         }
     }
 
@@ -69,7 +69,7 @@ StatusCode OrderedCaloHitList::Add(const CaloHitList &caloHitList)
 {
     for (const CaloHit *const pCaloHit : caloHitList)
     {
-        RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, this->Add(pCaloHit, pCaloHit->GetPseudoLayer()));
+        RETURN_ON_ERROR_ALLOW_MISSING(this->Add(pCaloHit, pCaloHit->GetPseudoLayer()));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -81,7 +81,7 @@ StatusCode OrderedCaloHitList::Remove(const CaloHitList &caloHitList)
 {
     for (const CaloHit *const pCaloHit : caloHitList)
     {
-        RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, this->Remove(pCaloHit, pCaloHit->GetPseudoLayer()));
+        RETURN_ON_ERROR_ALLOW_MISSING(this->Remove(pCaloHit, pCaloHit->GetPseudoLayer()));
     }
 
     return STATUS_CODE_SUCCESS;

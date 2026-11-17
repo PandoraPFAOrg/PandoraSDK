@@ -57,49 +57,49 @@ StatusCode PandoraSettings::Initialize(const TiXmlHandle *const pXmlHandle)
 StatusCode PandoraSettings::ReadGlobalSettings(const TiXmlHandle *const pXmlHandle)
 {
     m_isMonitoringEnabled = false;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(*pXmlHandle,
         "IsMonitoringEnabled", m_isMonitoringEnabled));
 
     m_shouldDisplayAlgorithmInfo = false;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(*pXmlHandle,
         "ShouldDisplayAlgorithmInfo", m_shouldDisplayAlgorithmInfo));
 
     m_singleHitTypeClusteringMode = false;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(*pXmlHandle,
         "SingleHitTypeClusteringMode", m_singleHitTypeClusteringMode));
 
     m_shouldCollapseMCParticlesToPfoTarget = false;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(*pXmlHandle,
         "ShouldCollapseMCParticlesToPfoTarget", m_shouldCollapseMCParticlesToPfoTarget));
 
     m_useSingleMCParticleAssociation = false;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(*pXmlHandle,
         "UseSingleMCParticleAssociation", m_useSingleMCParticleAssociation));
 
     m_electromagneticEnergyResolution = 0.2f;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(*pXmlHandle,
         "ElectromagneticEnergyResolution", m_electromagneticEnergyResolution));
 
     if (m_electromagneticEnergyResolution < std::numeric_limits<float>::epsilon())
         return STATUS_CODE_INVALID_PARAMETER;
 
     m_hadronicEnergyResolution = 0.6f;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(*pXmlHandle,
         "HadronicEnergyResolution", m_hadronicEnergyResolution));
 
     if (m_hadronicEnergyResolution < std::numeric_limits<float>::epsilon())
         return STATUS_CODE_INVALID_PARAMETER;
 
     m_mcPfoSelectionRadius = 500.f;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(*pXmlHandle,
         "MCPfoSelectionRadius", m_mcPfoSelectionRadius));
 
     m_mcPfoSelectionMomentum = 0.01f;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(*pXmlHandle,
         "MCPfoSelectionMomentum", m_mcPfoSelectionMomentum));
 
     m_mcPfoSelectionLowEnergyNPCutOff = 1.2f;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(*pXmlHandle,
         "MCPfoSelectionProtonNeutronEnergyCutOff", m_mcPfoSelectionLowEnergyNPCutOff));
 
     return STATUS_CODE_SUCCESS;

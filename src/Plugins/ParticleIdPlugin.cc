@@ -129,7 +129,7 @@ StatusCode ParticleId::InitializePlugin(const TiXmlHandle *const pXmlHandle, con
         return STATUS_CODE_FAILURE;
 
     std::string requestedPluginName;
-    RETURN_ON_ERROR_EXCEPT(STATUS_CODE_NOT_FOUND, XmlHelper::ReadValue(*pXmlHandle,
+    RETURN_ON_ERROR_ALLOW_MISSING(XmlHelper::ReadValue(*pXmlHandle,
         xmlTagName, requestedPluginName));
 
     if (requestedPluginName.empty())
